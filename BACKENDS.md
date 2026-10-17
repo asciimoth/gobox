@@ -116,6 +116,10 @@ the selected Job Object and filesystem mechanisms cannot enforce.
 `Disabled`. The child can receive the normal host environment and authority.
 Policy that requires a protection must fail in this mode.
 
+The `debug` package is the reference development implementation of this mode.
+It uses ordinary host processes, directories, and loopback sockets and clearly
+reports that it provides no security boundary.
+
 `Auto` applies the strongest qualified plan available and reports omissions as
 `OmittedAuto`. It must not silently weaken a fixed plan after allocation or
 launch starts. A failure while applying a selected restriction fails the

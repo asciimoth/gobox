@@ -62,6 +62,36 @@ See [BACKENDS.md](BACKENDS.md) for concrete Linux and Windows behavior that a
 production backend can provide. Those profiles are examples, not requirements
 that every implementation must use the same operating-system mechanisms.
 
+## Debug backend
+
+Package `github.com/asciimoth/gobox/debug` provides an `off`-mode backend for
+driver development. It starts registered programs as ordinary child processes,
+inherits the parent environment and identity, uses host loopback, and stores
+files in ordinary host directories. It is not a security boundary and must not
+be used to run untrusted programs.
+
+```go
+backend, err := debug.New(debug.Config{
+	Programs: map[gobox.ProgramID]debug.Program{
+		"helper": {
+			Executable: "/path/to/helper",
+			Arguments: func(launch gobox.Launch, resolve debug.ResolveValue) ([]string, error) {
+				value, err := resolve(launch.Inputs["config"])
+				return []string{"--config", value}, err
+			},
+		},
+	},
+	Templates: map[gobox.TemplateID]debug.Template{
+		"development": {Programs: []gobox.ProgramID{"helper"}},
+	},
+})
+```
+
+An empty `Config.Root` creates ephemeral storage. Set `Root` to preserve owner
+records and persistent sandbox storage across debug-backend restarts. The host
+still controls the logical program and template mappings; drivers do not supply
+executable paths.
+
 ## Versioning
 
 Interfaces in this package are shared by applications, drivers, and backends.
